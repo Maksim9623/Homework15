@@ -1,7 +1,8 @@
 CREATE TABLE colors
 (
         color_id integer PRIMARY KEY AUTOINCREMENT,
-        color varchar(50)
+        color1 varchar(50),
+        color2 varchar(50)
 );
 
 CREATE TABLE IF NOT EXISTS animals_color
@@ -12,22 +13,29 @@ CREATE TABLE IF NOT EXISTS animals_color
         FOREIGN KEY (colors_id) REFERENCES colors(color_id)
 );
 
-INSERT INTO  colors (color)
+INSERT INTO  colors (color1)
 SELECT DISTINCT
-        color1 AS color
+        color1 AS color1
 FROM animals;
 
 
-INSERT INTO colors (color)
-SELECT DISTINCT color2 AS color
+INSERT INTO colors (color2)
+SELECT DISTINCT color2 AS color2
 FROM animals;
 
-INSERT INTO animals_color (animals_id, colors_id);
+INSERT INTO animals_color (animals_id, colors_id)
 SELECT DISTINCT animals_new.id, colors.color_id
 FROM animals
-         INNER JOIN colors
-                    ON colors.color = animals.color2
-                        and colors.color = animals.color1
+JOIN colors
+ON colors.color2 = animals.color2
+LEFT JOIN animals_new
+ON animals_new.animal_id = animals.animal_id;
+
+INSERT INTO animals_color (animals_id, colors_id)
+SELECT DISTINCT animals_new.id, colors.color_id
+FROM animals
+JOIN colors
+ON colors.color1 = animals.color1
 LEFT JOIN animals_new
 ON animals_new.animal_id = animals.animal_id;
 
@@ -101,12 +109,12 @@ LEFT JOIN breeds
   ON breeds.breed = animals.breed;
 
 
-SELECT animals_new.id, animals_new.name, colors.color, breed, outcome_type
+SELECT animals_new.id, animals_new.name, colors.color1, breed, outcome_type
 FROM animals_new
 JOIN animals_color
 ON animals_color.animals_id = animals_new.id
 JOIN colors
 ON colors.color_id = animals_color.colors_id
 JOIN breeds on breeds.breed_id = animals_new.breed_id
-JOIN outcome  on outcome.id = animals_new.outcome_id
-WHERE  animals_new.id = 2  ;
+JOIN outcome  on outcome.id = animals_new.outcome_id;
+--WHERE  animals_new.id = 2  ;
